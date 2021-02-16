@@ -5,11 +5,13 @@
 // your new key right away.
 
 // For this exercise, we'll be using the "now playing" API endpoint
-// https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US
+
+  // https://api.themoviedb.org/3/movie/550?api_key=e2b83709fc94b3acc50f443afbca5aa8
 
 // Note: image data returned by the API will only give you the filename;
 // prepend with `https://image.tmdb.org/t/p/w500/` to get the 
 // complete image URL
+
 
 window.addEventListener('DOMContentLoaded', async function(event) {
   // Step 1: Construct a URL to get movies playing now from TMDB, fetch
@@ -17,6 +19,16 @@ window.addEventListener('DOMContentLoaded', async function(event) {
   // movies. Write the contents of this array to the JavaScript
   // console to ensure you've got good data
   // ⬇️ ⬇️ ⬇️
+
+  let apiKey = 'e2b83709fc94b3acc50f443afbca5aa8'
+  let url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US`
+  let db = firebase.firestore()
+
+  let response = await fetch(url)
+  let json = await response.json()
+  let movies = json.results
+  console.log(movies)
+
 
   // ⬆️ ⬆️ ⬆️ 
   // End Step 1
@@ -33,6 +45,28 @@ window.addEventListener('DOMContentLoaded', async function(event) {
   //   <a href="#" class="watched-button block text-center text-white bg-green-500 mt-4 px-4 py-2 rounded">I've watched this!</a>
   // </div>
   // ⬇️ ⬇️ ⬇️
+
+  for (let i=0; i<movies.length; i++) {
+    let movieID = movies[i].id
+    let poster = movies[i].poster_path
+    let movieName = movies[i].original_title
+    // console.log(movies.length)
+    // console.log(poster)
+    document.querySelector('.movies').insertAdjacentHTML('beforeend', `
+      <div class="w-1/5 p-4 .movies-${movieID}">
+      <img src="https://image.tmdb.org/t/p/w500/${poster}" class="w-full">
+      <a href="#" class="watched-button-${movieID} block text-center text-white bg-green-500 mt-4 px-4 py-2 rounded">I've watched this!</a>
+      </div>`)
+
+    document.querySelector(`.watched-button-${movieID}`).addEventListener('click', function(event) {
+      event.preventDefault()
+      // console.log(`${movieName} watched`)
+      let watchButton = document.querySelector(`.watched-button-${movieID}`)
+      if (watchButton.classList.contains('opacity-20') == true) {
+        watchButton.classList.remove('opacity-20')
+      } else {watchButton.classList.add('opacity-20')}
+  })
+  }
 
   // ⬆️ ⬆️ ⬆️ 
   // End Step 2
