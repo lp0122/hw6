@@ -22,7 +22,6 @@ window.addEventListener('DOMContentLoaded', async function(event) {
 
   let apiKey = 'e2b83709fc94b3acc50f443afbca5aa8'
   let url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US`
-  let db = firebase.firestore()
 
   let response = await fetch(url)
   let json = await response.json()
@@ -58,13 +57,20 @@ window.addEventListener('DOMContentLoaded', async function(event) {
       <a href="#" class="watched-button-${movieID} block text-center text-white bg-green-500 mt-4 px-4 py-2 rounded">I've watched this!</a>
       </div>`)
 
-    document.querySelector(`.watched-button-${movieID}`).addEventListener('click', function(event) {
+    document.querySelector(`.watched-button-${movieID}`).addEventListener('click', async function(event) {
       event.preventDefault()
       // console.log(`${movieName} watched`)
       let watchButton = document.querySelector(`.watched-button-${movieID}`)
       if (watchButton.classList.contains('opacity-20') == true) {
         watchButton.classList.remove('opacity-20')
       } else {watchButton.classList.add('opacity-20')}
+
+      let db = firebase.firestore()
+
+      await db.collection('watched').doc(`${movieID}`).set({
+        Title: movieName,
+        ID: movieID
+      })
   })
   }
 
